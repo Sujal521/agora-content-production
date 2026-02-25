@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGORA Content Production — Visual Workflow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #16213e 50%, #0f3460 100%);
+            color: #333;
+            padding: 40px 20px;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 60px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 50px 40px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 12px;
+            letter-spacing: -1.5px;
+            background: linear-gradient(135deg, #60a5fa 0%, #a78bfa 50%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #93c5fd;
+        }
+
+        .workflow-container {
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+
+        .phase-column {
+            position: relative;
+        }
+
+        .phase-header {
+            padding: 22px;
+            border-radius: 12px 12px 0 0;
+            color: white;
+            font-weight: 800;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            text-align: center;
+            margin-bottom: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .phase-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .phase-ideation-header {
+            background-color: #3B82F6;
+        }
+
+        .phase-longform-header {
+            background-color: #F59E0B;
+        }
+
+        .phase-shortform-header {
+            background-color: #10B981;
+        }
+
+        .phase-educational-header {
+            background-color: #8B5CF6;
+        }
+
+        .phase-posting-header {
+            background-color: #EC4899;
+        }
+
+        .phase-kpi-header {
+            background-color: #06B6D4;
+        }
+
+        .phase-paid-header {
+            background-color: #EF4444;
+        }
+
+        .tasks-group {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            padding: 24px;
+            background: white;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+            min-height: 600px;
+            position: relative;
+        }
+
+        .tasks-group::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(200, 200, 200, 0.3), transparent);
+        }
+
+        .task-card {
+            padding: 16px 14px;
+            border-radius: 12px;
+            border-left: 4px solid;
+            background-color: #f9fafb;
+            cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 13px;
+            line-height: 1.5;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .task-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .task-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15), 0 0 1px rgba(255,255,255,0.3);
+            background-color: #fff;
+        }
+
+        .task-card:hover::before {
+            opacity: 1;
+        }
+
+        .task-number {
+            font-weight: 700;
+            color: #1B2A4A;
+            font-size: 12px;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .task-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .task-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            align-items: center;
+            font-size: 11px;
+        }
+
+        .owner-badge {
+            background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+            color: #1e40af;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 11px;
+            letter-spacing: 0.3px;
+            border: 1px solid rgba(30, 64, 175, 0.2);
+        }
+
+        .priority-badge {
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-weight: 800;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+            border: 1px solid;
+        }
+
+        .priority-critical {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+            border-color: #dc2626;
+        }
+
+        .priority-high {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde047 100%);
+            color: #92400e;
+            border-color: #eab308;
+        }
+
+        .priority-medium {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: #1e40af;
+            border-color: #3b82f6;
+        }
+
+        .priority-conditional {
+            background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+            color: #581c87;
+            border-color: #a855f7;
+        }
+
+        .card-ideation {
+            border-left-color: #3B82F6;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        }
+
+        .card-longform {
+            border-left-color: #F59E0B;
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+        }
+
+        .card-shortform {
+            border-left-color: #10B981;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        }
+
+        .card-educational {
+            border-left-color: #8B5CF6;
+            background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+        }
+
+        .card-posting {
+            border-left-color: #EC4899;
+            background: linear-gradient(135deg, #fdf2f8 0%, #fbce88 100%);
+        }
+
+        .card-kpi {
+            border-left-color: #06B6D4;
+            background: linear-gradient(135deg, #ecf0ff 0%, #e0f2fe 100%);
+        }
+
+        .card-paid {
+            border-left-color: #EF4444;
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+        }
+
+        .flow-arrow {
+            position: absolute;
+            top: 50%;
+            right: -35px;
+            width: 30px;
+            height: 3px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.6) 0%, transparent 100%);
+            transform: translateY(-50%);
+            z-index: 5;
+        }
+
+        .flow-arrow::after {
+            content: '→';
+            position: absolute;
+            right: -12px;
+            top: -10px;
+            font-size: 20px;
+            color: rgba(255,255,255,0.6);
+            font-weight: bold;
+        }
+
+        .phase-column:last-child .flow-arrow {
+            display: none;
+        }
+
+        .gatekeeper-section {
+            grid-column: 1 / -1;
+            margin-top: 60px;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
+            border-radius: 16px;
+            border: 2px solid rgba(239, 68, 68, 0.3);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        .gatekeeper-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 900;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+
+        .gatekeeper-tasks {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .gatekeeper-card {
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            border-left: 5px solid #EF4444;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .gatekeeper-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 32px rgba(239, 68, 68, 0.2);
+        }
+
+        .gatekeeper-card .task-number {
+            color: #EF4444;
+            font-weight: 900;
+        }
+
+        .critical-note {
+            color: white;
+            text-align: center;
+            margin-top: 50px;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.2) 0%, rgba(239, 68, 68, 0.2) 100%);
+            border-radius: 16px;
+            border: 2px solid rgba(220, 38, 38, 0.5);
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(220, 38, 38, 0.2);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                border-color: rgba(220, 38, 38, 0.5);
+            }
+            50% {
+                border-color: rgba(220, 38, 38, 0.8);
+            }
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+            padding: 25px 30px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .legend-color {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 1400px) {
+            .workflow-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .flow-arrow {
+                right: -25px;
+                width: 20px;
+            }
+
+            .flow-arrow::after {
+                right: -10px;
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .workflow-container {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .flow-arrow {
+                display: none;
+            }
+
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .tasks-group {
+                min-height: auto;
+            }
+
+            .phase-header {
+                font-size: 13px;
+                padding: 16px;
+            }
+
+            .task-card {
+                padding: 12px;
+                font-size: 12px;
+            }
+
+            .task-title {
+                font-size: 12px;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .workflow-container {
+                gap: 0;
+            }
+
+            .tasks-group {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                min-height: auto;
+            }
+
+            .task-card:hover {
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AGORA Content Production</h1>
+            <p>Visual Workflow — Phase by Phase Progression</p>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #3B82F6;"></div>
+                <span>Strategy & Ideation</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #F59E0B;"></div>
+                <span>Long-Form Production</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #10B981;"></div>
+                <span>Short-Form Content</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #8B5CF6;"></div>
+                <span>Educational Repurposing</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #06B6D4;"></div>
+                <span>KPI Tracking</span>
+            </div>
+        </div>
+
+        <div class="workflow-container">
+            <!-- Phase 1: Strategy & Ideation -->
+            <div class="phase-column">
+                <div class="phase-header phase-ideation-header">Strategy & Ideation</div>
+                <div class="tasks-group">
+                    <div class="task-card card-ideation">
+                        <div class="task-number">Task #1</div>
+                        <div class="task-title">Content Idea Submission</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Entire Team</span>
+                            <span class="priority-badge priority-high">HIGH</span>
+                        </div>
+                    </div>
+                    <div class="task-card card-ideation">
+                        <div class="task-number">Task #2</div>
+                        <div class="task-title">Brainstorming Session</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Entire Team</span>
+                            <span class="priority-badge priority-high">HIGH</span>
+                        </div>
+                    </div>
+                    <div class="task-card card-ideation">
+                        <div class="task-number">Task #3</div>
+                        <div class="task-title">Topic Finalization (Lock)</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Mridu</span>
+                            <span class="priority-badge priority-critical">CRITICAL</span>
+                        </div>
+                    </div>
+                    <div class="task-card card-ideation">
+                        <div class="task-number">Task #4</div>
+                        <div class="task-title">Final Messaging Alignment</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Mridu + Abhinav</span>
+                            <span class="priority-badge priority-critical">CRITICAL</span>
+                        </div>
+                    </div>
+                    <div class="task-card card-ideation">
+                        <div class="task-number">Task #5</div>
+                        <div class="task-title">Hook Direction</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Mridu + Abhinav</span>
+                            <span class="priority-badge priority-high">HIGH</span>
+                        </div>
+                    </div>
+                    <div class="task-card card-ideation">
+                        <div class="task-number">Task #6</div>
+                        <div class="task-title">CTA Direction</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Mridu + Ramesh Sir</span>
+                            <span class="priority-badge priority-high">HIGH</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flow-arrow"></div>
+            </div>
+
+            <!-- Phase 2: Long-Form Production -->
+            <div class="phase-column">
+                <div class="phase-header phase-longform-header">Long-Form Production</div>
+                <div class="tasks-group">
+                    <div class="task-card card-longform">
+                        <div class="task-number">Task #7</div>
+                        <div class="task-title">Shoot Execution</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Pandey Ji</span>
+                            <span class="priority-badge priority-critical">CRITICAL</span>
+                        </div>
+                    </div>
+                    <div class="task-card card-longform">
+                        <div class="task-number">Task #8</div>
+                        <div class="task-title">Camera & Audio Setup</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Pandey Ji</span>
+                            <span class="priority-badge priority-critical">CRITICAL</span>
+                        </div>
+                    </div>
+                    <div class="task-card card-longform">
+                        <div class="task-number">Task #9</div>
+                        <div class="task-title">Full YouTube Edit</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Sumit</span>
+                            <span class="priority-badge priority-critical">CRITICAL</span>
+                        </div>
+                    </div>
+                    <div class="task-card card-longform">
+                        <div class="task-number">Task #10</div>
+                        <div class="task-title">Thumbnail Suggestion</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Sumit</span>
+                            <span class="priority-badge priority-high">HIGH</span>
+                        </div>
+                    </div>
+                    <div class="task-card card-longform">
+                        <div class="task-number">Task #11</div>
+                        <div class="task-title">SEO Title & Description Draft</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Sujal</span>
+                            <span class="priority-badge priority-high">HIGH</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flow-arrow"></div>
+            </div>
+
+            <!-- Phase 3: Short-Form Content -->
+            <div class="phase-column">
+                <div class="phase-header phase-shortform-header">Short-Form Content</div>
+                <div class="tasks-group">
+                    <div class="task-card card-shortform">
+                        <div class="task-number">Task #12</div>
+                        <div class="task-title">3–5 YouTube Shorts</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Sumit</span>
+                            <span class="priority-badge priority-critical">CRITICAL</span>
+                        </div>
+                    </div>
+                    <div class="task-card card-shortform">
+                        <div class="task-number">Task #13</div>
+                        <div class="task-title">4 Reels Production</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Sumit</span>
+                            <span class="priority-badge priority-critical">CRITICAL</span>
+                        </div>
+                    </div>
+                    <div class="task-card card-shortform">
+                        <div class="task-number">Task #14</div>
+                        <div class="task-title">4–5 Story Snippets</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Sumit + Mridu</span>
+                            <span class="priority-badge priority-high">HIGH</span>
+                        </div>
+                    </div>
+                    <div class="task-card card-shortform">
+                        <div class="task-number">Task #15</div>
+                        <div class="task-title">1 Carousel (Key Takeaways)</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Mridu</span>
+                            <span class="priority-badge priority-high">HIGH</span>
+                        </div>
+                    </div>
+                    <div class="task-card card-shortform">
+                        <div class="task-number">Task #16</div>
+                        <div class="task-title">1 Quote Graphic</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Mridu</span>
+                            <span class="priority-badge priority-medium">MEDIUM</span>
+                        </div>
+                    </div>
+                    <div class="task-card card-shortform">
+                        <div class="task-number">Task #17</div>
+                        <div class="task-title">Clip Selection</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Ramesh Sir + Mridu + Sumit</span>
+                            <span class="priority-badge priority-high">HIGH</span>
+                        </div>
+                    </div>
+                    <div class="task-card card-shortform">
+                        <div class="task-number">Task #18</div>
+                        <div class="task-title">Caption Draft</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Sujal + Mridu</span>
+                            <span class="priority-badge priority-high">HIGH</span>
+                        </div>
+                    </div>
+                    <div class="task-card card-shortform">
+                        <div class="task-number">Task #19</div>
+                        <div class="task-title">Hook Optimization</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Sujal + Sumit</span>
+                            <span class="priority-badge priority-high">HIGH</span>
+                        </div>
+                    </div>
+                    <div class="task-card card-shortform">
+                        <div class="task-number">Task #20</div>
+                        <div class="task-title">Platform Formatting (9:16)</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Sumit</span>
+                            <span class="priority-badge priority-critical">CRITICAL</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flow-arrow"></div>
+            </div>
+
+            <!-- Phase 4: Educational Repurposing -->
+            <div class="phase-column">
+                <div class="phase-header phase-educational-header">Educational Repurposing</div>
+                <div class="tasks-group">
+                    <div class="task-card card-educational">
+                        <div class="task-number">Task #21</div>
+                        <div class="task-title">Carousel (Key Takeaway)</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Mridu</span>
+                            <span class="priority-badge priority-high">HIGH</span>
+                        </div>
+                    </div>
+                    <div class="task-card card-educational">
+                        <div class="task-number">Task #22</div>
+                        <div class="task-title">Quote Graphic Design</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Mridu</span>
+                            <span class="priority-badge priority-medium">MEDIUM</span>
+                        </div>
+                    </div>
+                    <div class="task-card card-educational">
+                        <div class="task-number">Task #23</div>
+                        <div class="task-title">Caption Refinement</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Mridu</span>
+                            <span class="priority-badge priority-medium">MEDIUM</span>
+                        </div>
+                    </div>
+                    <div class="task-card card-educational">
+                        <div class="task-number">Task #24</div>
+                        <div class="task-title">Final Messaging Alignment</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Mridu + Ramesh Sir</span>
+                            <span class="priority-badge priority-critical">CRITICAL</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flow-arrow"></div>
+            </div>
+
+
+            <!-- Phase 6: KPI Tracking -->
+            <div class="phase-column">
+                <div class="phase-header phase-kpi-header">KPI Tracking</div>
+                <div class="tasks-group">
+                    <div class="task-card card-kpi">
+                        <div class="task-number">Task #30</div>
+                        <div class="task-title">Instagram KPI Dashboard</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Sujal</span>
+                            <span class="priority-badge priority-high">HIGH</span>
+                        </div>
+                    </div>
+                    <div class="task-card card-kpi">
+                        <div class="task-number">Task #31</div>
+                        <div class="task-title">YouTube KPI Dashboard</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Sujal</span>
+                            <span class="priority-badge priority-high">HIGH</span>
+                        </div>
+                    </div>
+                    <div class="task-card card-kpi">
+                        <div class="task-number">Task #32</div>
+                        <div class="task-title">Identify New Key Metrics</div>
+                        <div class="task-meta">
+                            <span class="owner-badge">Sujal</span>
+                            <span class="priority-badge priority-medium">MEDIUM</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Paid Ads Gate Section -->
+        <div class="gatekeeper-section">
+            <div class="gatekeeper-title">🔒 Paid Ads Gate — Conditional Approval Required</div>
+            <div class="gatekeeper-tasks">
+                <div class="gatekeeper-card">
+                    <div class="task-number">Task #33</div>
+                    <div class="task-title">Instagram Boost Decision</div>
+                    <div class="task-meta">
+                        <span class="owner-badge">Ramesh Sir</span>
+                        <span class="priority-badge priority-conditional">CONDITIONAL</span>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 12px; color: #666; line-height: 1.5;">
+                        Only after 10 strong posts with highest shares/saves/retention
+                    </div>
+                </div>
+                <div class="gatekeeper-card">
+                    <div class="task-number">Task #34</div>
+                    <div class="task-title">YouTube Ads Decision</div>
+                    <div class="task-meta">
+                        <span class="owner-badge">Ramesh Sir</span>
+                        <span class="priority-badge priority-conditional">CONDITIONAL</span>
+                    </div>
+                    <div style="margin-top: 10px; font-size: 12px; color: #666; line-height: 1.5;">
+                        Only after 5-7 strong organic episodes
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="critical-note">
+            ⚠️  CRITICAL GATEKEEPER RULE
+            <br>
+            Ownership is final. No content goes live without approval from Ramesh Sir.
+        </div>
+    </div>
+</body>
+</html>
